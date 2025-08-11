@@ -2,6 +2,8 @@
 
 A C# Windows Forms application that simulates photon detection with various noise sources and signal patterns, designed for astronomical data simulation and analysis.
 
+![screenshot](screenshot.png)
+
 ## Project Concept
 
 The Noise Simulator simulates real-world astronomical detectors by modeling:
