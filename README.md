@@ -1,4 +1,4 @@
-# Noise Simulator
+# Camera Noise Simulator
 
 A C# Windows Forms application that simulates photon detection with various noise sources and signal patterns, designed for astronomical data simulation and analysis.
 
