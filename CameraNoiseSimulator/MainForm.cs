@@ -7,31 +7,6 @@ namespace NoiseSimulator;
 public partial class MainForm : Form
 {
     private Random random = new Random();
-    private PictureBox? pictureBox;
-    private Button? generateButton;
-    private TrackBar? backgroundTrackBar;
-    private TrackBar? signalTrackBar;
-    private TrackBar? exposureTrackBar;
-    private TrackBar? readNoiseTrackBar;
-    private TrackBar? numberOfExposuresTrackBar;
-    private Label? backgroundLabel;
-    private Label? signalLabel;
-    private Label? exposureLabel;
-    private Label? readNoiseLabel;
-    private Label? numberOfExposuresLabel;
-    private ComboBox? patternComboBox;
-    private Label? patternLabel;
-    private RichTextBox? statisticsTextBox;
-    private NumericUpDown? minValueNumeric;
-    private NumericUpDown? maxValueNumeric;
-    private Label? minValueLabel;
-    private Label? maxValueLabel;
-    private Button? resetRangeButton;
-    private NumericUpDown? signalSquareNumeric;
-    private Label? signalSquareLabel;
-    private NumericUpDown? squareSizeNumeric;
-    private Label? squareSizeLabel;
-    private CheckBox? verticalLinesCheckBox;
     private SignalGenerator signalGenerator;
     private StatisticsCalculator statisticsCalculator;
     private uint currentMinValue = 0;
@@ -50,6 +25,9 @@ public partial class MainForm : Form
         signalGenerator = new SignalGenerator();
         statisticsCalculator = new StatisticsCalculator();
         
+        // Initialize pattern ComboBox
+        InitializePatternComboBox();
+        
         // Update labels initially
         UpdateBackgroundLabel();
         UpdateSignalLabel();
@@ -63,206 +41,64 @@ public partial class MainForm : Form
         GenerateNoiseImage();
     }
 
-    private void InitializeComponent()
+
+
+    // Event handlers for Designer compatibility
+    private void GenerateButton_Click(object sender, EventArgs e)
     {
-        this.Text = "Noise Simulator";
-        this.Size = new Size(1370, 1400);
-        this.StartPosition = FormStartPosition.CenterScreen;
-        
-        // Apply dark theme to form
-        this.BackColor = Color.FromArgb(32, 32, 32);
-        this.ForeColor = Color.White;
-        
-        // Create instruction label
-        Label instructionLabel = new Label
-        {
-            Text = "Configure signal and background parameters below:",
-            Size = new Size(800, 20),
-            Location = new Point(170, 15),
-            Font = new Font(FontFamily.GenericSansSerif, 10),
-            ForeColor = Color.LightBlue,
-            BackColor = Color.FromArgb(32, 32, 32)
-        };
+        GenerateNoiseImage();
+    }
 
-        // Create PictureBox for displaying the image
-        pictureBox = new PictureBox
-        {
-            Size = new Size(1024, 1024),
-            SizeMode = PictureBoxSizeMode.Normal,
-            BorderStyle = BorderStyle.FixedSingle,
-            Location = new Point(5, 330),
-            BackColor = Color.FromArgb(48, 48, 48)
-        };
+    private void SaveButton_Click(object sender, EventArgs e)
+    {
+        SaveImageAsFits();
+    }
 
-        // Create generate button
-        generateButton = new Button
-        {
-            Text = "Generate New",
-            Size = new Size(150, 30),
-            Location = new Point(10, 10),
-            BackColor = Color.FromArgb(80, 80, 80), // Slightly lighter for prominence
-            ForeColor = Color.White,
-            FlatStyle = FlatStyle.Flat,
-            FlatAppearance = { BorderSize = 1, BorderColor = Color.LightBlue }, // Add border to make it stand out
-            Font = new Font(FontFamily.GenericSansSerif, 9, FontStyle.Bold) // Bold font for emphasis
-        };
-        generateButton.Click += (sender, e) => GenerateNoiseImage();
+    private void BackgroundTrackBar_ValueChanged(object sender, EventArgs e)
+    {
+        UpdateBackgroundLabel();
+    }
 
-        // Set as default button
-        this.AcceptButton = generateButton;
+    private void SignalTrackBar_ValueChanged(object sender, EventArgs e)
+    {
+        UpdateSignalLabel();
+    }
 
-        // Create save button
-        Button saveButton = new Button
-        {
-            Text = "Save FITS",
-            Size = new Size(190, 30),
-            Location = new Point(1150, 10),
-            BackColor = Color.FromArgb(64, 64, 64),
-            ForeColor = Color.White,
-            FlatStyle = FlatStyle.Flat,
-            FlatAppearance = { BorderSize = 0 }
-        };
-        saveButton.Click += (sender, e) => SaveImageAsFits();
+    private void ExposureTrackBar_ValueChanged(object sender, EventArgs e)
+    {
+        UpdateExposureLabel();
+    }
 
-        // Create background controls
-        backgroundLabel = new Label
-        {
-            Text = "Background:",
-            Size = new Size(110, 20),
-            Location = new Point(10, 50),
-            ForeColor = Color.White,
-            BackColor = Color.FromArgb(32, 32, 32),
-            TextAlign = ContentAlignment.MiddleRight
-        };
+    private void ReadNoiseTrackBar_ValueChanged(object sender, EventArgs e)
+    {
+        UpdateReadNoiseLabel();
+    }
 
-        backgroundTrackBar = new TrackBar
-        {
-            Minimum = 0,
-            Maximum = 1000,
-            Value = 10,
-            Size = new Size(1000, 45),
-            Location = new Point(120, 45),
-            TickFrequency = 100,
-            BackColor = Color.FromArgb(32, 32, 32),
-            TickStyle = TickStyle.BottomRight
-        };
-        backgroundTrackBar!.ValueChanged += (sender, e) => UpdateBackgroundLabel();
+    private void NumberOfExposuresTrackBar_ValueChanged(object sender, EventArgs e)
+    {
+        UpdateNumberOfExposuresLabel();
+    }
 
-        // Create signal controls
-        signalLabel = new Label
-        {
-            Text = "Signal:",
-            Size = new Size(110, 20),
-            Location = new Point(10, 100),
-            ForeColor = Color.White,
-            BackColor = Color.FromArgb(32, 32, 32),
-            TextAlign = ContentAlignment.MiddleRight
-        };
+    private void PatternComboBox_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        UpdateSignalSquareRange();
+        UpdateSquareSizeLabel();
+        GenerateNoiseImage(); // Auto-regenerate image when pattern changes
+    }
 
-        signalTrackBar = new TrackBar
-        {
-            Minimum = 0,
-            Maximum = 1000,
-            Value = 100,
-            Size = new Size(1000, 45),
-            Location = new Point(120, 95),
-            TickFrequency = 100,
-            BackColor = Color.FromArgb(32, 32, 32),
-            TickStyle = TickStyle.BottomRight
-        };
-        signalTrackBar!.ValueChanged += (sender, e) => UpdateSignalLabel();
+    private void SquareSizeNumeric_ValueChanged(object sender, EventArgs e)
+    {
+        GenerateNoiseImage();
+    }
 
-        // Create exposure controls
-        exposureLabel = new Label
-        {
-            Text = "Exposure:",
-            Size = new Size(110, 20),
-            Location = new Point(10, 150),
-            ForeColor = Color.White,
-            BackColor = Color.FromArgb(32, 32, 32),
-            TextAlign = ContentAlignment.MiddleRight
-        };
+    private void VerticalLinesCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+        GenerateNoiseImage();
+    }
 
-        exposureTrackBar = new TrackBar
-        {
-            Minimum = 0,
-            Maximum = 1000,
-            Value = 10, // Default to 1.0
-            Size = new Size(1000, 45),
-            Location = new Point(120, 145),
-            TickFrequency = 100,
-            BackColor = Color.FromArgb(32, 32, 32),
-            TickStyle = TickStyle.BottomRight
-        };
-        exposureTrackBar!.ValueChanged += (sender, e) => UpdateExposureLabel();
-
-        // Create read noise controls
-        readNoiseLabel = new Label
-        {
-            Text = "Read Noise:",
-            Size = new Size(110, 20),
-            Location = new Point(10, 200),
-            ForeColor = Color.White,
-            BackColor = Color.FromArgb(32, 32, 32),
-            TextAlign = ContentAlignment.MiddleRight
-        };
-
-        readNoiseTrackBar = new TrackBar
-        {
-            Minimum = 0,
-            Maximum = 1000,
-            Value = 10, // Default to 1.0
-            Size = new Size(1000, 45),
-            Location = new Point(120, 195),
-            TickFrequency = 100,
-            BackColor = Color.FromArgb(32, 32, 32),
-            TickStyle = TickStyle.BottomRight
-        };
-        readNoiseTrackBar!.ValueChanged += (sender, e) => UpdateReadNoiseLabel();
-
-        // Create number of exposures controls
-        numberOfExposuresLabel = new Label
-        {
-            Text = "Exposures:",
-            Size = new Size(110, 20),
-            Location = new Point(10, 250),
-            ForeColor = Color.White,
-            BackColor = Color.FromArgb(32, 32, 32),
-            TextAlign = ContentAlignment.MiddleRight
-        };
-
-        numberOfExposuresTrackBar = new TrackBar
-        {
-            Minimum = 1,
-            Maximum = 256,
-            Value = 1,
-            Size = new Size(1000, 45),
-            Location = new Point(120, 245),
-            TickFrequency = 25,
-            BackColor = Color.FromArgb(32, 32, 32),
-            TickStyle = TickStyle.BottomRight
-        };
-        numberOfExposuresTrackBar!.ValueChanged += (sender, e) => UpdateNumberOfExposuresLabel();
-
-        // Create pattern controls
-        patternLabel = new Label
-        {
-            Text = "Signal Pattern:",
-            Size = new Size(100, 20),
-            Location = new Point(10, 300),
-            ForeColor = Color.White,
-            BackColor = Color.FromArgb(32, 32, 32)
-        };
-
-        patternComboBox = new ComboBox
-        {
-            Size = new Size(200, 25),
-            Location = new Point(120, 295),
-            DropDownStyle = ComboBoxStyle.DropDownList,
-            BackColor = Color.FromArgb(48, 48, 48),
-            ForeColor = Color.White,
-            FlatStyle = FlatStyle.Flat
-        };
+    private void InitializePatternComboBox()
+    {
+        patternComboBox.Items.Clear();
         patternComboBox.Items.Add("Square");
         patternComboBox.Items.Add("3x3 Squares");
         patternComboBox.Items.Add("5x5 Squares");
@@ -272,184 +108,6 @@ public partial class MainForm : Form
         patternComboBox.Items.Add("Continuous lines");
         patternComboBox.Items.Add("No Signal");
         patternComboBox.SelectedIndex = 4; // Default to 9x9 Squares
-        patternComboBox.SelectedIndexChanged += (sender, e) => 
-        {
-            UpdateSignalSquareRange();
-            UpdateSquareSizeLabel();
-            GenerateNoiseImage(); // Auto-regenerate image when pattern changes
-        };
-
-        // Create square size controls
-        squareSizeLabel = new Label
-        {
-            Text = "Square Size:",
-            Size = new Size(80, 20),
-            Location = new Point(330, 300),
-            ForeColor = Color.White,
-            BackColor = Color.FromArgb(32, 32, 32)
-        };
-
-        squareSizeNumeric = new NumericUpDown
-        {
-            Minimum = 10,
-            Maximum = 200,
-            Value = 60, // Default square size
-            Size = new Size(80, 25),
-            Location = new Point(410, 295),
-            DecimalPlaces = 0,
-            Increment = 5,
-            BackColor = Color.FromArgb(48, 48, 48),
-            ForeColor = Color.White,
-            BorderStyle = BorderStyle.FixedSingle
-        };
-        squareSizeNumeric.ValueChanged += (sender, e) => GenerateNoiseImage();
-
-        // Create vertical lines checkbox
-        verticalLinesCheckBox = new CheckBox
-        {
-            Text = "Vertical Lines",
-            Size = new Size(120, 25),
-            Location = new Point(500, 295),
-            Checked = true,
-            BackColor = Color.FromArgb(32, 32, 32),
-            ForeColor = Color.White,
-            FlatStyle = FlatStyle.Flat
-        };
-        verticalLinesCheckBox.CheckedChanged += (sender, e) => GenerateNoiseImage();
-
-        // Create statistics text box
-        statisticsTextBox = new RichTextBox
-        {
-            Size = new Size(300, 400),
-            Location = new Point(1040, 500),
-            Font = new Font(FontFamily.GenericMonospace, 9, FontStyle.Regular),
-            BackColor = Color.FromArgb(48, 48, 48),
-            ForeColor = Color.White,
-            BorderStyle = BorderStyle.None,
-            ReadOnly = true,
-            ScrollBars = RichTextBoxScrollBars.None
-        };
-
-        // Create min value controls
-        minValueLabel = new Label
-        {
-            Text = "Min:",
-            Size = new Size(100, 20),
-            Location = new Point(1040, 330),
-            TextAlign = ContentAlignment.MiddleLeft,
-            ForeColor = Color.White,
-            BackColor = Color.FromArgb(32, 32, 32)
-        };
-
-        minValueNumeric = new NumericUpDown
-        {
-            Minimum = 0,
-            Maximum = int.MaxValue, // Handle very large photon counts
-            Value = 0,
-            Size = new Size(80, 25),
-            Location = new Point(1140, 330),
-            DecimalPlaces = 0,
-            Increment = 1,
-            BackColor = Color.FromArgb(48, 48, 48),
-            ForeColor = Color.White,
-            BorderStyle = BorderStyle.FixedSingle
-        };
-        minValueNumeric!.ValueChanged += MinValueNumeric_ValueChanged;
-
-        // Create max value controls
-        maxValueLabel = new Label
-        {
-            Text = "Max:",
-            Size = new Size(100, 20),
-            Location = new Point(1040, 360),
-            TextAlign = ContentAlignment.MiddleLeft,
-            ForeColor = Color.White,
-            BackColor = Color.FromArgb(32, 32, 32)
-        };
-
-        maxValueNumeric = new NumericUpDown
-        {
-            Minimum = 0,
-            Maximum = int.MaxValue, // Handle very large photon counts
-            Value = 255,
-            Size = new Size(80, 25),
-            Location = new Point(1140, 360),
-            DecimalPlaces = 0,
-            Increment = 1,
-            BackColor = Color.FromArgb(48, 48, 48),
-            ForeColor = Color.White,
-            BorderStyle = BorderStyle.FixedSingle
-        };
-        maxValueNumeric!.ValueChanged += MaxValueNumeric_ValueChanged;
-
-        // Create reset range button
-        resetRangeButton = new Button
-        {
-            Text = "Reset Display Range",
-            Size = new Size(140, 30),
-            Location = new Point(1040, 390),
-            Font = new Font(FontFamily.GenericSansSerif, 8),
-            BackColor = Color.FromArgb(64, 64, 64),
-            ForeColor = Color.White,
-            FlatStyle = FlatStyle.Flat,
-            FlatAppearance = { BorderSize = 0 }
-        };
-        resetRangeButton!.Click += ResetRangeButton_Click;
-
-        // Create signal square selection controls
-        signalSquareLabel = new Label
-        {
-            Text = "Selected Square:",
-            Size = new Size(100, 20),
-            Location = new Point(1040, 430),
-            TextAlign = ContentAlignment.MiddleLeft,
-            ForeColor = Color.White,
-            BackColor = Color.FromArgb(32, 32, 32)
-        };
-
-        signalSquareNumeric = new NumericUpDown
-        {
-            Minimum = 0,
-            Maximum = 80, // Maximum for 9x9 pattern (81 squares, 0-80)
-            Value = 0, // Default to central square (index 0)
-            Size = new Size(80, 25),
-            Location = new Point(1140, 430),
-            DecimalPlaces = 0,
-            Increment = 1,
-            BackColor = Color.FromArgb(48, 48, 48),
-            ForeColor = Color.White,
-            BorderStyle = BorderStyle.FixedSingle
-        };
-        signalSquareNumeric!.ValueChanged += SignalSquareNumeric_ValueChanged;
-
-        // Add controls to form
-        this.Controls.Add(instructionLabel);
-        this.Controls.Add(pictureBox);
-        this.Controls.Add(generateButton);
-        this.Controls.Add(saveButton); // Add save button
-        this.Controls.Add(backgroundLabel);
-        this.Controls.Add(backgroundTrackBar);
-        this.Controls.Add(signalLabel);
-        this.Controls.Add(signalTrackBar);
-        this.Controls.Add(exposureLabel);
-        this.Controls.Add(exposureTrackBar);
-        this.Controls.Add(readNoiseLabel);
-        this.Controls.Add(readNoiseTrackBar);
-        this.Controls.Add(numberOfExposuresLabel);
-        this.Controls.Add(numberOfExposuresTrackBar);
-        this.Controls.Add(patternLabel);
-        this.Controls.Add(patternComboBox);
-        this.Controls.Add(statisticsTextBox);
-        this.Controls.Add(minValueLabel);
-        this.Controls.Add(minValueNumeric);
-        this.Controls.Add(maxValueLabel);
-        this.Controls.Add(maxValueNumeric);
-        this.Controls.Add(resetRangeButton);
-        this.Controls.Add(signalSquareLabel);
-        this.Controls.Add(signalSquareNumeric);
-        this.Controls.Add(squareSizeLabel);
-        this.Controls.Add(squareSizeNumeric);
-        this.Controls.Add(verticalLinesCheckBox);
     }
 
     private void GenerateNoiseImage()
