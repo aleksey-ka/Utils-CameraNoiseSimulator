@@ -1201,7 +1201,7 @@ public partial class MainForm : Form
                     
                     // Save as FITS with proper scaling parameters
                     // Use BZERO and BSCALE to ensure correct data interpretation
-                    FitsWriter.SaveFits(saveDialog.FileName, fitsData, bzero, bscale);
+                    FitsWriter.SaveFits(saveDialog.FileName, fitsData);
                     
                     // Show success message with debug info
                     MessageBox.Show($"Image saved successfully as FITS to:\n{saveDialog.FileName}\n\nFile size: {new FileInfo(saveDialog.FileName).Length} bytes\n16-bit dynamic range preserved.\n\n{debugInfo}", "Save Successful", 

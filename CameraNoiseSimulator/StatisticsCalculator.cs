@@ -10,14 +10,16 @@ namespace NoiseSimulator;
 public class StatisticsCalculator
 {
     /// <summary>
-    /// Calculates statistics for background areas only (pixels with zero signal flux)
+    /// Calculates statistics for background pixels (where signal flux is zero)
     /// </summary>
     /// <param name="detectedArrayFloats">Array of detected photon values (corrected for offset)</param>
     /// <param name="signalGenerator">SignalGenerator instance for pattern detection</param>
     /// <param name="pattern">Current pattern name</param>
     /// <param name="squareSize">Size of squares in pixels</param>
-    /// <param name="useVerticalLines">Whether vertical lines pattern is enabled</param>
+    /// <param name="useVerticalLines">Whether to use vertical lines pattern</param>
     /// <param name="baseSignalFlux">Base signal flux value</param>
+    /// <param name="imageWidth">Width of the image</param>
+    /// <param name="imageHeight">Height of the image</param>
     /// <returns>Tuple of (mean, std, count) for background pixels only</returns>
     public (float mean, float std, int count) CalculateBackgroundStatistics(
         float[] detectedArrayFloats, 
@@ -25,16 +27,18 @@ public class StatisticsCalculator
         string pattern,
         int squareSize,
         bool useVerticalLines,
-        float baseSignalFlux)
+        float baseSignalFlux,
+        int imageWidth = 1024,
+        int imageHeight = 1024)
     {
         // Collect background pixel values (where signal flux is zero)
         var backgroundValues = new List<float>();
         
-        for (int y = 0; y < 1024; y++)
+        for (int y = 0; y < imageHeight; y++)
         {
-            for (int x = 0; x < 1024; x++)
+            for (int x = 0; x < imageWidth; x++)
             {
-                int index = y * 1024 + x;
+                int index = y * imageWidth + x;
                 
                 // Check if this pixel has zero signal flux
                 float signalFlux = signalGenerator.GetPatternSignalFlux(x, y, baseSignalFlux, pattern, squareSize, useVerticalLines);
@@ -67,13 +71,17 @@ public class StatisticsCalculator
     /// <param name="pattern">Current pattern name</param>
     /// <param name="selectedSquareIndex">Index of the selected square</param>
     /// <param name="squareSize">Size of squares in pixels</param>
+    /// <param name="imageWidth">Width of the image</param>
+    /// <param name="imageHeight">Height of the image</param>
     /// <returns>Tuple of (mean, std, count) for selected square pixels only</returns>
     public (float mean, float std, int count) CalculateCentralSquareStatistics(
         float[] detectedArrayFloats,
         SignalGenerator signalGenerator,
         string pattern,
         int selectedSquareIndex,
-        int squareSize)
+        int squareSize,
+        int imageWidth = 1024,
+        int imageHeight = 1024)
     {
         // Check if "No Signal" pattern is selected
         if (pattern == "No Signal")
@@ -91,9 +99,9 @@ public class StatisticsCalculator
             return (0, 0, 0); // Invalid square index - return zero statistics
         }
         
-        // Define square parameters
-        const int centerX = 1024 / 2;
-        const int centerY = 1024 / 2;
+        // Define square parameters - center the pattern in the image
+        int centerX = imageWidth / 2;
+        int centerY = imageHeight / 2;
         const int gap = 30;
         int halfSquare = squareSize / 2;
         
@@ -108,9 +116,9 @@ public class StatisticsCalculator
         {
             for (int x = squareX - halfSquare; x < squareX + halfSquare; x++)
             {
-                if (x >= 0 && x < 1024 && y >= 0 && y < 1024)
+                if (x >= 0 && x < imageWidth && y >= 0 && y < imageHeight)
                 {
-                    int index = y * 1024 + x;
+                    int index = y * imageWidth + x;
                     signalValues.Add(detectedArrayFloats[index]);
                 }
             }
