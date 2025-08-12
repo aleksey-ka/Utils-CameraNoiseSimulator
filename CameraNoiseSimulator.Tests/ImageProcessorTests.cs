@@ -15,13 +15,10 @@ public class ImageProcessorTests
     }
     
     [Fact]
-    public void ImageProcessor_Constructor_ShouldUseCustomConfig()
+    public void ImageProcessor_Constructor_ShouldWorkWithoutConfig()
     {
-        // Arrange
-        var config = SimulationConfig.CreateCustom(512, 512);
-        
         // Act
-        var processor = new ImageProcessor(config);
+        var processor = new ImageProcessor();
         
         // Assert
         Assert.NotNull(processor);
@@ -31,8 +28,7 @@ public class ImageProcessorTests
     public void ImageProcessor_GenerateImage_ShouldCreateImageWithCorrectDimensions()
     {
         // Arrange
-        var config = SimulationConfig.CreateCustom(256, 256);
-        var processor = new ImageProcessor(config);
+        var processor = new ImageProcessor();
         
         // Act
         var image = processor.GenerateImage(
@@ -45,8 +41,8 @@ public class ImageProcessorTests
             squareSize: 20);
         
         // Assert
-        Assert.Equal(256, image.GetLength(0)); // Height
-        Assert.Equal(256, image.GetLength(1)); // Width
+        Assert.Equal(1024, image.GetLength(0)); // Height (fixed size)
+        Assert.Equal(1024, image.GetLength(1)); // Width (fixed size)
     }
     
     [Fact]

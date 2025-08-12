@@ -3,13 +3,10 @@ namespace NoiseSimulator;
 /// <summary>
 /// Main processor for generating astronomical images with noise and signal
 /// </summary>
-public class ImageProcessor : IImageProcessor
+public class ImageProcessor
 {
-    private readonly SimulationConfig _config;
-    
-    public ImageProcessor(SimulationConfig? config = null)
+    public ImageProcessor()
     {
-        _config = config ?? SimulationConfig.Default;
     }
     
     public uint[,] GenerateImage(
@@ -25,11 +22,11 @@ public class ImageProcessor : IImageProcessor
         var photonDetector = new PhotonDetector(seed, readNoise);
         var signalGenerator = new SignalGenerator();
         
-        uint[,] imageData = new uint[_config.ImageHeight, _config.ImageWidth];
+        uint[,] imageData = new uint[1024, 1024];
         
-        for (int y = 0; y < _config.ImageHeight; y++)
+        for (int y = 0; y < 1024; y++)
         {
-            for (int x = 0; x < _config.ImageWidth; x++)
+            for (int x = 0; x < 1024; x++)
             {
                 // Get signal flux for this pixel
                 float pixelSignalFlux = signalGenerator.GetPatternSignalFlux(
@@ -75,10 +72,10 @@ public class ImageProcessor : IImageProcessor
         }
         
         // Average the exposures
-        uint[,] averagedImage = new uint[_config.ImageHeight, _config.ImageWidth];
-        for (int y = 0; y < _config.ImageHeight; y++)
+        uint[,] averagedImage = new uint[1024, 1024];
+        for (int y = 0; y < 1024; y++)
         {
-            for (int x = 0; x < _config.ImageWidth; x++)
+            for (int x = 0; x < 1024; x++)
             {
                 long sum = 0;
                 for (int exp = 0; exp < numExposures; exp++)

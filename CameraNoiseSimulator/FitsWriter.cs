@@ -5,26 +5,13 @@ namespace NoiseSimulator;
 /// <summary>
 /// FITS (Flexible Image Transport System) file writer for astronomical data
 /// </summary>
-public class FitsWriter : IImageExporter
+public class FitsWriter
 {
-    private readonly SimulationConfig _config;
-    
-    public FitsWriter(SimulationConfig? config = null)
+    public FitsWriter()
     {
-        _config = config ?? SimulationConfig.Default;
     }
     
-    public string[] GetSupportedFormats() => new[] { "FITS", "fits" };
-    
-    public string GetFileExtension(string format) => ".fits";
-    
-    public void ExportImage(string filePath, uint[,] imageData, string format)
-    {
-        if (!GetSupportedFormats().Contains(format.ToUpper()))
-            throw new ArgumentException($"Unsupported format: {format}");
-            
-        SaveFits(filePath, imageData);
-    }
+
     
     /// <summary>
     /// Saves image data to a FITS file
@@ -33,12 +20,6 @@ public class FitsWriter : IImageExporter
     {
         int height = imageData.GetLength(0);
         int width = imageData.GetLength(1);
-        
-        // Validate dimensions
-        if (height != _config.ImageHeight || width != _config.ImageWidth)
-        {
-            throw new ArgumentException($"Image dimensions {width}x{height} do not match expected {_config.ImageWidth}x{_config.ImageHeight}");
-        }
         
         using (var writer = new BinaryWriter(File.Create(filePath)))
         {
@@ -72,7 +53,7 @@ public class FitsWriter : IImageExporter
             $"NAXIS2  = {height,20} / Length of data axis 2",
             "EXTEND  =                    T / FITS dataset may contain extensions",
             "ORIGIN  = 'Camera Noise Simulator' / Origin of the FITS file",
-            "DATE    = '2024-01-01' / Date of file creation",
+            $"DATE    = '{DateTime.Now:yyyy-MM-dd}' / Date of file creation",
             "COMMENT = 'Simulated astronomical image with noise'",
             "END"
         };
