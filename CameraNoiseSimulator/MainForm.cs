@@ -234,7 +234,7 @@ public partial class MainForm : Form
         numberOfExposuresTrackBar = new TrackBar
         {
             Minimum = 1,
-            Maximum = 250,
+            Maximum = 256,
             Value = 1,
             Size = new Size(1000, 45),
             Location = new Point(120, 245),
