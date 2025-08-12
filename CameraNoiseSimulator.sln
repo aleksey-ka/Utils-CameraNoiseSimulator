@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CameraNoiseSimulator", "CameraNoiseSimulator\CameraNoiseSimulator.csproj", "{DA2F4B3F-4F45-44C8-A43F-B579F10CB41B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CameraNoiseSimulator.Tests", "CameraNoiseSimulator.Tests\CameraNoiseSimulator.Tests.csproj", "{59CC9017-4A86-48A7-A1C5-45FA6EB8293E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DA2F4B3F-4F45-44C8-A43F-B579F10CB41B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA2F4B3F-4F45-44C8-A43F-B579F10CB41B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA2F4B3F-4F45-44C8-A43F-B579F10CB41B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA2F4B3F-4F45-44C8-A43F-B579F10CB41B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59CC9017-4A86-48A7-A1C5-45FA6EB8293E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59CC9017-4A86-48A7-A1C5-45FA6EB8293E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59CC9017-4A86-48A7-A1C5-45FA6EB8293E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59CC9017-4A86-48A7-A1C5-45FA6EB8293E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2E552109-A003-49E7-B2DC-B2D036E16AC9}
+	EndGlobalSection
+EndGlobal
