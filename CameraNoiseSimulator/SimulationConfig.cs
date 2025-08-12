@@ -6,6 +6,4 @@ namespace NoiseSimulator;
 public class SimulationConfig
 {
     // This class is kept for potential future use but currently simplified
-    
-
-} 
+}

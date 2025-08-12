@@ -10,9 +10,7 @@ public class FitsWriter
     public FitsWriter()
     {
     }
-    
 
-    
     /// <summary>
     /// Saves image data to a FITS file
     /// </summary>
