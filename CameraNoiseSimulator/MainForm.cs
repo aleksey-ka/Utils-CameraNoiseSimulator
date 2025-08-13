@@ -1083,26 +1083,47 @@ namespace NoiseSimulator
                     
                     // Calculate bar height (normalized to available height)
                     int barHeight;
-                    if (useLogarithmic && minADU > 0)
+                    if (useLogarithmic)
                     {
-                        // Logarithmic scaling: log(ADU) / log(maxADU) * availableHeight
-                        float logMin = (float)Math.Log(minADU);
-                        float logMax = (float)Math.Log(maxADU);
-                        float logRange = logMax - logMin;
-                        if (logRange > 0)
+                        // Robust logarithmic scaling that handles zero and small values
+                        if (maxADU > 0)
                         {
-                            float normalizedValue = (float)Math.Log(aduSum) - logMin;
-                            barHeight = (int)((normalizedValue / logRange) * availableHeight);
+                            if (aduSum == 0)
+                            {
+                                // Zero ADUs get minimum bar height (1 pixel)
+                                barHeight = 1;
+                            }
+                            else
+                            {
+                                // Use log(ADU + 1) to handle zero values gracefully
+                                // This shifts the log curve so log(1) = 0, log(2) = 0.69, etc.
+                                float logValue = (float)Math.Log(aduSum + 1);
+                                float logMax = (float)Math.Log(maxADU + 1);
+                                
+                                if (logMax > 0)
+                                {
+                                    // Normalize to available height
+                                    barHeight = (int)((logValue / logMax) * availableHeight);
+                                    // Ensure minimum visible height for non-zero values
+                                    if (barHeight < 2) barHeight = 2;
+                                }
+                                else
+                                {
+                                    barHeight = 1;
+                                }
+                            }
                         }
                         else
                         {
-                            barHeight = 0;
+                            barHeight = 1;
                         }
                     }
                     else
                     {
                         // Linear scaling
                         barHeight = (int)(((aduSum - minADU) / (float)range) * availableHeight);
+                        // Ensure minimum height for visibility
+                        if (barHeight < 1) barHeight = 1;
                     }
                     
                     // Calculate bar position
@@ -1180,21 +1201,34 @@ namespace NoiseSimulator
                     g.DrawString(title, axisFont, textBrush, titleX, 10);
                 }
                 
-                // Display ADU sum value for the selected square
-                int selectedSquareIndex = (int)signalSquareNumeric!.Value;
-                if (selectedSquareIndex < squareADUSums.Length)
-                {
-                    uint selectedADUSum = squareADUSums[selectedSquareIndex];
-                    string intensityText = $"Selected Square {selectedSquareIndex}: {selectedADUSum} ADUs";
-                    
-                    using (Font intensityFont = new Font("Arial", 12, FontStyle.Bold))
-                    using (SolidBrush intensityBrush = new SolidBrush(Color.Yellow))
-                    {
-                        SizeF intensitySize = g.MeasureString(intensityText, intensityFont);
-                        float intensityX = margin + (availableWidth - intensitySize.Width) / 2;
-                        g.DrawString(intensityText, intensityFont, intensityBrush, intensityX, 35);
-                    }
-                }
+                                        // Display ADU sum value for the selected square
+                        int selectedSquareIndex = (int)signalSquareNumeric!.Value;
+                        if (selectedSquareIndex < squareADUSums.Length)
+                        {
+                            uint selectedADUSum = squareADUSums[selectedSquareIndex];
+                            string intensityText = $"Selected Square {selectedSquareIndex}: {selectedADUSum} ADUs";
+                            
+                            using (Font intensityFont = new Font("Arial", 12, FontStyle.Bold))
+                            using (SolidBrush intensityBrush = new SolidBrush(Color.Yellow))
+                            {
+                                SizeF intensitySize = g.MeasureString(intensityText, intensityFont);
+                                float intensityX = margin + (availableWidth - intensitySize.Width) / 2;
+                                g.DrawString(intensityText, intensityFont, intensityBrush, intensityX, 35);
+                            }
+                        }
+                        
+                        // Add debug info for logarithmic mode
+                        if (useLogarithmic)
+                        {
+                            string debugText = $"Log Scale: Min={minADU}, Max={maxADU}, Range={range}";
+                            using (Font debugFont = new Font("Arial", 9))
+                            using (SolidBrush debugBrush = new SolidBrush(Color.LightGray))
+                            {
+                                SizeF debugSize = g.MeasureString(debugText, debugFont);
+                                float debugX = margin + (availableWidth - debugSize.Width) / 2;
+                                g.DrawString(debugText, debugFont, debugBrush, debugX, 55);
+                            }
+                        }
                 
                 // No legend needed - simplified color scheme
             }

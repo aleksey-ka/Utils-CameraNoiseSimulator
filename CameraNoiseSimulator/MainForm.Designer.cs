@@ -248,9 +248,9 @@ namespace NoiseSimulator
             patternComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             patternComboBox.FlatStyle = FlatStyle.Flat;
             patternComboBox.ForeColor = Color.White;
-            patternComboBox.Location = new Point(133, 266);
+            patternComboBox.Location = new Point(98, 274);
             patternComboBox.Name = "patternComboBox";
-            patternComboBox.Size = new Size(200, 23);
+            patternComboBox.Size = new Size(150, 23);
             patternComboBox.TabIndex = 12;
             patternComboBox.SelectedIndexChanged += PatternComboBox_SelectedIndexChanged;
             // 
@@ -258,7 +258,7 @@ namespace NoiseSimulator
             // 
             patternLabel.BackColor = Color.FromArgb(32, 32, 32);
             patternLabel.ForeColor = Color.White;
-            patternLabel.Location = new Point(10, 270);
+            patternLabel.Location = new Point(10, 276);
             patternLabel.Name = "patternLabel";
             patternLabel.Size = new Size(85, 20);
             patternLabel.TabIndex = 13;
@@ -283,7 +283,7 @@ namespace NoiseSimulator
             minValueNumeric.BackColor = Color.FromArgb(48, 48, 48);
             minValueNumeric.BorderStyle = BorderStyle.FixedSingle;
             minValueNumeric.ForeColor = Color.White;
-            minValueNumeric.Location = new Point(813, 271);
+            minValueNumeric.Location = new Point(813, 274);
             minValueNumeric.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             minValueNumeric.Name = "minValueNumeric";
             minValueNumeric.Size = new Size(80, 23);
@@ -295,7 +295,7 @@ namespace NoiseSimulator
             maxValueNumeric.BackColor = Color.FromArgb(48, 48, 48);
             maxValueNumeric.BorderStyle = BorderStyle.FixedSingle;
             maxValueNumeric.ForeColor = Color.White;
-            maxValueNumeric.Location = new Point(948, 272);
+            maxValueNumeric.Location = new Point(948, 274);
             maxValueNumeric.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             maxValueNumeric.Name = "maxValueNumeric";
             maxValueNumeric.Size = new Size(80, 23);
@@ -307,7 +307,7 @@ namespace NoiseSimulator
             // 
             minValueLabel.BackColor = Color.FromArgb(32, 32, 32);
             minValueLabel.ForeColor = Color.White;
-            minValueLabel.Location = new Point(770, 271);
+            minValueLabel.Location = new Point(770, 276);
             minValueLabel.Name = "minValueLabel";
             minValueLabel.Size = new Size(36, 20);
             minValueLabel.TabIndex = 17;
@@ -318,7 +318,7 @@ namespace NoiseSimulator
             // 
             maxValueLabel.BackColor = Color.FromArgb(32, 32, 32);
             maxValueLabel.ForeColor = Color.White;
-            maxValueLabel.Location = new Point(905, 272);
+            maxValueLabel.Location = new Point(905, 276);
             maxValueLabel.Name = "maxValueLabel";
             maxValueLabel.Size = new Size(36, 20);
             maxValueLabel.TabIndex = 18;
@@ -369,7 +369,7 @@ namespace NoiseSimulator
             squareSizeNumeric.BorderStyle = BorderStyle.FixedSingle;
             squareSizeNumeric.ForeColor = Color.White;
             squareSizeNumeric.Increment = new decimal(new int[] { 5, 0, 0, 0 });
-            squareSizeNumeric.Location = new Point(423, 266);
+            squareSizeNumeric.Location = new Point(423, 274);
             squareSizeNumeric.Maximum = new decimal(new int[] { 200, 0, 0, 0 });
             squareSizeNumeric.Minimum = new decimal(new int[] { 10, 0, 0, 0 });
             squareSizeNumeric.Name = "squareSizeNumeric";
@@ -382,7 +382,7 @@ namespace NoiseSimulator
             // 
             squareSizeLabel.BackColor = Color.FromArgb(32, 32, 32);
             squareSizeLabel.ForeColor = Color.White;
-            squareSizeLabel.Location = new Point(343, 271);
+            squareSizeLabel.Location = new Point(343, 276);
             squareSizeLabel.Name = "squareSizeLabel";
             squareSizeLabel.Size = new Size(80, 20);
             squareSizeLabel.TabIndex = 23;
@@ -395,7 +395,7 @@ namespace NoiseSimulator
             verticalLinesCheckBox.CheckState = CheckState.Checked;
             verticalLinesCheckBox.FlatStyle = FlatStyle.Flat;
             verticalLinesCheckBox.ForeColor = Color.White;
-            verticalLinesCheckBox.Location = new Point(513, 266);
+            verticalLinesCheckBox.Location = new Point(513, 271);
             verticalLinesCheckBox.Name = "verticalLinesCheckBox";
             verticalLinesCheckBox.Size = new Size(120, 25);
             verticalLinesCheckBox.TabIndex = 24;
