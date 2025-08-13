@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using System.Threading;
 using System.Drawing.Imaging;
+using System.Drawing;
 
 namespace NoiseSimulator
 {
@@ -235,10 +236,14 @@ namespace NoiseSimulator
             // Add green corner dots to visualize the selected square
             AddCornerDots(bitmap);
 
-            // Display the bitmap
-            pictureBox!.Image?.Dispose();
-            pictureBox!.Image = bitmap;
-        }
+                    // Display the bitmap
+        pictureBox!.Image?.Dispose();
+        pictureBox!.Image = bitmap;
+        
+        // Generate and display the ADU sum graph
+        uint[] squareADUSums = CalculateSquareADUSums(detectedArray);
+        GenerateIntensityGraph(squareADUSums);
+    }
         
         /// <summary>
         /// Updates a label with a trackbar value divided by 10
@@ -354,6 +359,17 @@ namespace NoiseSimulator
         private void SignalSquareNumeric_ValueChanged(object? sender, EventArgs e)
         {
             // Direct update without timer
+            if (currentImageData is not null)
+            {
+                RecalculateStatistics();
+            }
+        }
+
+        /// <summary>
+        /// Event handler for logarithmic checkbox
+        /// </summary>
+        private void LogarithmicCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
             if (currentImageData is not null)
             {
                 RecalculateStatistics();
@@ -773,8 +789,15 @@ namespace NoiseSimulator
             // Don't show theoretical signal statistics if vertical lines are enabled (they're not accurate due to bimodal distribution)
             var displayTheoreticalSignal = useVerticalLines ? default : theoreticalSignal;
             
-            UpdateStatisticsDisplay(backgroundStats, signalStats, squareInfo, signalToNoiseRatio, theoreticalBackground, displayTheoreticalSignal, offset, currentImageData, detectedArrayFloats, useVerticalLines);
+                    UpdateStatisticsDisplay(backgroundStats, signalStats, squareInfo, signalToNoiseRatio, theoreticalBackground, displayTheoreticalSignal, offset, currentImageData, detectedArrayFloats, useVerticalLines);
+        
+        // Update the ADU sum graph
+        if (currentImageData != null)
+        {
+            uint[] squareADUSums = CalculateSquareADUSums(currentImageData);
+            GenerateIntensityGraph(squareADUSums);
         }
+    }
         
         #endregion
 
@@ -926,6 +949,259 @@ namespace NoiseSimulator
             
             rtfText += "}";
             statisticsTextBox!.Rtf = rtfText;
+        }
+
+        #endregion
+
+        #region Graph Generation
+
+                /// <summary>
+        /// Calculates the sum of ADUs (pixel values) for each square in the current pattern
+        /// Uses actual generated image data, not theoretical calculations
+        /// </summary>
+        /// <param name="imageData">The current generated image data</param>
+        /// <returns>Array of ADU sums for each square, indexed by square number</returns>
+        private uint[] CalculateSquareADUSums(uint[] imageData)
+        {
+            string selectedPattern = patternComboBox!.SelectedItem?.ToString() ?? "Square";
+            int squareSize = (int)squareSizeNumeric!.Value;
+            bool useVerticalLines = verticalLinesCheckBox!.Checked;
+            
+            // Get the maximum valid square index for the current pattern
+            int maxValidIndex = signalGenerator.GetMaxValidIndex(selectedPattern);
+            
+            // Create array to hold ADU sums for each square
+            uint[] squareADUSums = new uint[maxValidIndex + 1];
+            
+            // Define square parameters - center the pattern in the image
+            const int centerX = 1024 / 2;
+            const int centerY = 1024 / 2;
+            const int gap = 30;
+            int halfSquare = squareSize / 2;
+            
+                            // Calculate ADU sum for each square
+                for (int squareIndex = 0; squareIndex <= maxValidIndex; squareIndex++)
+                {
+                    // Calculate the position of the current square
+                    int squareX = centerX + signalGenerator.SpiralPatternDx[squareIndex] * (squareSize + gap);
+                    int squareY = centerY + signalGenerator.SpiralPatternDy[squareIndex] * (squareSize + gap);
+                    
+                    uint squareSum = 0;
+                    
+                    // Sum all pixels within the square
+                    for (int y = squareY - halfSquare; y < squareY + halfSquare; y++)
+                    {
+                        for (int x = squareX - halfSquare; x < squareX + halfSquare; x++)
+                        {
+                            if (x >= 0 && x < 1024 && y >= 0 && y < 1024)
+                            {
+                                int index = y * 1024 + x;
+                                squareSum += imageData[index];
+                            }
+                        }
+                    }
+                    
+                    // Store the sum of ADUs for this square
+                    squareADUSums[squareIndex] = squareSum;
+                }
+            
+            return squareADUSums;
+        }
+
+            /// <summary>
+    /// Generates and displays a bar graph showing ADU sum distribution across pattern squares
+    /// </summary>
+    /// <param name="squareADUSums">Array of ADU sum values for each square</param>
+    private void GenerateIntensityGraph(uint[] squareADUSums)
+    {
+        if (squareADUSums.Length == 0) return;
+        
+        const int graphWidth = 490;
+        const int graphHeight = 433;
+        const int margin = 40;
+        const int barSpacing = 2;
+        
+        // Create bitmap for the graph
+        Bitmap graphBitmap = new Bitmap(graphWidth, graphHeight);
+        using (Graphics g = Graphics.FromImage(graphBitmap))
+        {
+            // Set up graphics quality
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+            
+            // Fill background
+            g.Clear(Color.FromArgb(48, 48, 48));
+            
+                        // Find data range for scaling
+            uint minADU = squareADUSums.Min();
+            uint maxADU = squareADUSums.Max();
+            uint range = maxADU - minADU;
+            
+            // Avoid division by zero
+            if (range == 0) range = 1;
+            
+            // Check if logarithmic scaling is enabled
+            bool useLogarithmic = logarithmicCheckBox!.Checked;
+                
+                // Calculate bar dimensions
+                int availableWidth = graphWidth - 2 * margin;
+                int barWidth = Math.Max(1, (availableWidth - (squareADUSums.Length - 1) * barSpacing) / squareADUSums.Length);
+                int availableHeight = graphHeight - 2 * margin;
+            
+                // Ensure the last bar fits within the available width
+                int totalBarWidth = squareADUSums.Length * barWidth + (squareADUSums.Length - 1) * barSpacing;
+                if (totalBarWidth > availableWidth)
+                {
+                    barWidth = Math.Max(1, (availableWidth - (squareADUSums.Length - 1) * barSpacing) / squareADUSums.Length);
+                }
+                
+                // Draw grid lines
+                using (Pen gridPen = new Pen(Color.FromArgb(64, 64, 64), 1))
+                {
+                    // Vertical grid lines (every 5 squares)
+                    for (int i = 0; i <= squareADUSums.Length; i += 5)
+                    {
+                        int x = margin + i * (barWidth + barSpacing);
+                        if (x <= graphWidth - margin)
+                        {
+                            g.DrawLine(gridPen, x, margin, x, graphHeight - margin);
+                        }
+                    }
+                    
+                    // Horizontal grid lines (5 lines)
+                    for (int i = 0; i <= 5; i++)
+                    {
+                        int y = margin + (i * availableHeight) / 5;
+                        g.DrawLine(gridPen, margin, y, graphWidth - margin, y);
+                    }
+                }
+                
+                // Draw bars
+                for (int i = 0; i < squareADUSums.Length; i++)
+                {
+                    uint aduSum = squareADUSums[i];
+                    
+                    // Calculate bar height (normalized to available height)
+                    int barHeight;
+                    if (useLogarithmic && minADU > 0)
+                    {
+                        // Logarithmic scaling: log(ADU) / log(maxADU) * availableHeight
+                        float logMin = (float)Math.Log(minADU);
+                        float logMax = (float)Math.Log(maxADU);
+                        float logRange = logMax - logMin;
+                        if (logRange > 0)
+                        {
+                            float normalizedValue = (float)Math.Log(aduSum) - logMin;
+                            barHeight = (int)((normalizedValue / logRange) * availableHeight);
+                        }
+                        else
+                        {
+                            barHeight = 0;
+                        }
+                    }
+                    else
+                    {
+                        // Linear scaling
+                        barHeight = (int)(((aduSum - minADU) / (float)range) * availableHeight);
+                    }
+                    
+                    // Calculate bar position
+                    int x = margin + i * (barWidth + barSpacing);
+                    int y = graphHeight - margin - barHeight;
+                        
+                                        // Choose color based on selection
+                    Color barColor;
+                    if (i == (int)signalSquareNumeric!.Value)
+                    {
+                        // Selected square - highlight in yellow
+                        barColor = Color.Yellow;
+                    }
+                    else
+                    {
+                        // All other squares - use consistent blue color
+                        barColor = Color.FromArgb(0, 150, 255);
+                    }
+                    
+                    // Draw the bar
+                    using (SolidBrush brush = new SolidBrush(barColor))
+                    {
+                        g.FillRectangle(brush, x, y, barWidth, barHeight);
+                    }
+                    
+                    // Draw bar border
+                    using (Pen borderPen = new Pen(Color.White, 1))
+                    {
+                        if( barHeight > 0 )
+                        {
+                            g.DrawRectangle(borderPen, x, y, barWidth, barHeight);
+                        }
+                        else
+                        {
+                            g.DrawLine( borderPen, x, y, x + barWidth, y);
+                        }
+                    }
+                    
+                    // Draw square index label below the bar (every 5th bar to avoid clutter)
+                    if (i % 5 == 0 || i == squareADUSums.Length - 1)
+                    {
+                        using (Font labelFont = new Font("Arial", 8))
+                        using (SolidBrush textBrush = new SolidBrush(Color.White))
+                        {
+                            string label = i.ToString();
+                            SizeF textSize = g.MeasureString(label, labelFont);
+                            float textX = x + (barWidth - textSize.Width) / 2;
+                            g.DrawString(label, labelFont, textBrush, textX, graphHeight - margin + 5);
+                        }
+                    }
+                }
+                
+                // Draw axis labels
+                using (Font axisFont = new Font("Arial", 10, FontStyle.Bold))
+                using (SolidBrush textBrush = new SolidBrush(Color.White))
+                {
+                    // Y-axis label (rotated)
+                    string yLabel = useLogarithmic ? "Sum of ADUs (Log Scale)" : "Sum of ADUs";
+                    g.TranslateTransform(margin - 20, graphHeight / 2);
+                    g.RotateTransform(-90);
+                    SizeF yLabelSize = g.MeasureString(yLabel, axisFont);
+                    g.DrawString(yLabel, axisFont, textBrush, -yLabelSize.Width / 2, -yLabelSize.Height / 2);
+                    g.ResetTransform();
+                    
+                    // X-axis label
+                    string xLabel = "Square Index";
+                    SizeF xLabelSize = g.MeasureString(xLabel, axisFont);
+                    float xLabelX = margin + (availableWidth - xLabelSize.Width) / 2;
+                    g.DrawString(xLabel, axisFont, textBrush, xLabelX, graphHeight - margin + 25);
+                    
+                    // Title
+                    string title = $"Sum of ADUs - Pattern: {patternComboBox!.SelectedItem} {(useLogarithmic ? "(Log Scale)" : "")}";
+                    SizeF titleSize = g.MeasureString(title, axisFont);
+                    float titleX = margin + (availableWidth - titleSize.Width) / 2;
+                    g.DrawString(title, axisFont, textBrush, titleX, 10);
+                }
+                
+                // Display ADU sum value for the selected square
+                int selectedSquareIndex = (int)signalSquareNumeric!.Value;
+                if (selectedSquareIndex < squareADUSums.Length)
+                {
+                    uint selectedADUSum = squareADUSums[selectedSquareIndex];
+                    string intensityText = $"Selected Square {selectedSquareIndex}: {selectedADUSum} ADUs";
+                    
+                    using (Font intensityFont = new Font("Arial", 12, FontStyle.Bold))
+                    using (SolidBrush intensityBrush = new SolidBrush(Color.Yellow))
+                    {
+                        SizeF intensitySize = g.MeasureString(intensityText, intensityFont);
+                        float intensityX = margin + (availableWidth - intensitySize.Width) / 2;
+                        g.DrawString(intensityText, intensityFont, intensityBrush, intensityX, 35);
+                    }
+                }
+                
+                // No legend needed - simplified color scheme
+            }
+            
+            // Display the graph
+            graphPictureBox!.Image?.Dispose();
+            graphPictureBox!.Image = graphBitmap;
         }
 
         #endregion

@@ -50,6 +50,8 @@ namespace NoiseSimulator
         private CheckBox verticalLinesCheckBox;
         private Button saveButton;
         private Label instructionLabel;
+        private PictureBox graphPictureBox;
+        private CheckBox logarithmicCheckBox;
 
         /// <summary>
         /// Required method for Designer support - do not modify
@@ -84,6 +86,8 @@ namespace NoiseSimulator
             verticalLinesCheckBox = new CheckBox();
             saveButton = new Button();
             instructionLabel = new Label();
+            graphPictureBox = new PictureBox();
+            logarithmicCheckBox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)pictureBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)backgroundTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)signalTrackBar).BeginInit();
@@ -94,6 +98,7 @@ namespace NoiseSimulator
             ((System.ComponentModel.ISupportInitialize)maxValueNumeric).BeginInit();
             ((System.ComponentModel.ISupportInitialize)signalSquareNumeric).BeginInit();
             ((System.ComponentModel.ISupportInitialize)squareSizeNumeric).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)graphPictureBox).BeginInit();
             SuspendLayout();
             // 
             // pictureBox
@@ -188,7 +193,7 @@ namespace NoiseSimulator
             backgroundLabel.ForeColor = Color.White;
             backgroundLabel.Location = new Point(10, 45);
             backgroundLabel.Name = "backgroundLabel";
-            backgroundLabel.Size = new Size(77, 20);
+            backgroundLabel.Size = new Size(101, 20);
             backgroundLabel.TabIndex = 7;
             backgroundLabel.Text = "Background:";
             backgroundLabel.TextAlign = ContentAlignment.MiddleLeft;
@@ -199,7 +204,7 @@ namespace NoiseSimulator
             signalLabel.ForeColor = Color.White;
             signalLabel.Location = new Point(10, 90);
             signalLabel.Name = "signalLabel";
-            signalLabel.Size = new Size(77, 20);
+            signalLabel.Size = new Size(101, 20);
             signalLabel.TabIndex = 8;
             signalLabel.Text = "Signal:";
             signalLabel.TextAlign = ContentAlignment.MiddleLeft;
@@ -210,7 +215,7 @@ namespace NoiseSimulator
             exposureLabel.ForeColor = Color.White;
             exposureLabel.Location = new Point(10, 134);
             exposureLabel.Name = "exposureLabel";
-            exposureLabel.Size = new Size(77, 20);
+            exposureLabel.Size = new Size(101, 20);
             exposureLabel.TabIndex = 9;
             exposureLabel.Text = "Exposure:";
             exposureLabel.TextAlign = ContentAlignment.MiddleLeft;
@@ -221,7 +226,7 @@ namespace NoiseSimulator
             readNoiseLabel.ForeColor = Color.White;
             readNoiseLabel.Location = new Point(10, 178);
             readNoiseLabel.Name = "readNoiseLabel";
-            readNoiseLabel.Size = new Size(77, 20);
+            readNoiseLabel.Size = new Size(101, 20);
             readNoiseLabel.TabIndex = 10;
             readNoiseLabel.Text = "Read Noise:";
             readNoiseLabel.TextAlign = ContentAlignment.MiddleLeft;
@@ -232,7 +237,7 @@ namespace NoiseSimulator
             numberOfExposuresLabel.ForeColor = Color.White;
             numberOfExposuresLabel.Location = new Point(10, 222);
             numberOfExposuresLabel.Name = "numberOfExposuresLabel";
-            numberOfExposuresLabel.Size = new Size(77, 20);
+            numberOfExposuresLabel.Size = new Size(101, 20);
             numberOfExposuresLabel.TabIndex = 11;
             numberOfExposuresLabel.Text = "Exposures:";
             numberOfExposuresLabel.TextAlign = ContentAlignment.MiddleLeft;
@@ -269,7 +274,7 @@ namespace NoiseSimulator
             statisticsTextBox.Name = "statisticsTextBox";
             statisticsTextBox.ReadOnly = true;
             statisticsTextBox.ScrollBars = RichTextBoxScrollBars.None;
-            statisticsTextBox.Size = new Size(300, 1021);
+            statisticsTextBox.Size = new Size(490, 551);
             statisticsTextBox.TabIndex = 14;
             statisticsTextBox.Text = "";
             // 
@@ -351,9 +356,9 @@ namespace NoiseSimulator
             // 
             signalSquareLabel.BackColor = Color.FromArgb(32, 32, 32);
             signalSquareLabel.ForeColor = Color.White;
-            signalSquareLabel.Location = new Point(1185, 275);
+            signalSquareLabel.Location = new Point(1185, 276);
             signalSquareLabel.Name = "signalSquareLabel";
-            signalSquareLabel.Size = new Size(100, 20);
+            signalSquareLabel.Size = new Size(93, 20);
             signalSquareLabel.TabIndex = 21;
             signalSquareLabel.Text = "Selected Square:";
             signalSquareLabel.TextAlign = ContentAlignment.MiddleLeft;
@@ -405,9 +410,9 @@ namespace NoiseSimulator
             saveButton.FlatAppearance.BorderSize = 0;
             saveButton.FlatStyle = FlatStyle.Flat;
             saveButton.ForeColor = Color.White;
-            saveButton.Location = new Point(1035, 12);
+            saveButton.Location = new Point(1405, 8);
             saveButton.Name = "saveButton";
-            saveButton.Size = new Size(290, 30);
+            saveButton.Size = new Size(122, 30);
             saveButton.TabIndex = 25;
             saveButton.Text = "Save FITS";
             saveButton.UseVisualStyleBackColor = false;
@@ -424,11 +429,34 @@ namespace NoiseSimulator
             instructionLabel.TabIndex = 26;
             instructionLabel.Text = "Configure signal and background parameters below:";
             // 
+            // graphPictureBox
+            // 
+            graphPictureBox.BackColor = Color.FromArgb(48, 48, 48);
+            graphPictureBox.Location = new Point(1037, 863);
+            graphPictureBox.Name = "graphPictureBox";
+            graphPictureBox.Size = new Size(490, 442);
+            graphPictureBox.TabIndex = 27;
+            graphPictureBox.TabStop = false;
+            // 
+            // logarithmicCheckBox
+            // 
+            logarithmicCheckBox.BackColor = Color.FromArgb(32, 32, 32);
+            logarithmicCheckBox.ForeColor = Color.White;
+            logarithmicCheckBox.Location = new Point(1037, 1315);
+            logarithmicCheckBox.Name = "logarithmicCheckBox";
+            logarithmicCheckBox.Size = new Size(150, 20);
+            logarithmicCheckBox.TabIndex = 28;
+            logarithmicCheckBox.Text = "Logarithmic Y-axis";
+            logarithmicCheckBox.UseVisualStyleBackColor = false;
+            logarithmicCheckBox.CheckedChanged += LogarithmicCheckBox_CheckedChanged;
+            // 
             // MainForm
             // 
             AcceptButton = generateButton;
             BackColor = Color.FromArgb(32, 32, 32);
-            ClientSize = new Size(1345, 1335);
+            ClientSize = new Size(1539, 1335);
+            Controls.Add(graphPictureBox);
+            Controls.Add(logarithmicCheckBox);
             Controls.Add(instructionLabel);
             Controls.Add(saveButton);
             Controls.Add(verticalLinesCheckBox);
@@ -470,6 +498,7 @@ namespace NoiseSimulator
             ((System.ComponentModel.ISupportInitialize)maxValueNumeric).EndInit();
             ((System.ComponentModel.ISupportInitialize)signalSquareNumeric).EndInit();
             ((System.ComponentModel.ISupportInitialize)squareSizeNumeric).EndInit();
+            ((System.ComponentModel.ISupportInitialize)graphPictureBox).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
