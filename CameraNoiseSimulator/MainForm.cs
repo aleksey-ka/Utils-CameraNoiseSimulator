@@ -108,6 +108,7 @@ namespace NoiseSimulator
             patternComboBox.Items.Add("5x5 Squares");
             patternComboBox.Items.Add("7x7 Squares");
             patternComboBox.Items.Add("9x9 Squares");
+            patternComboBox.Items.Add("11x11 Squares");
             patternComboBox.Items.Add("Gaussian Spots");
             patternComboBox.Items.Add("Continuous lines");
             patternComboBox.Items.Add("No Signal");
@@ -361,7 +362,11 @@ namespace NoiseSimulator
             // Direct update without timer
             if (currentImageData is not null)
             {
+                // Update statistics and graph
                 RecalculateStatistics();
+                
+                // Redraw the image with new corner dots for the selected square
+                RegenerateBitmap();
             }
         }
 
@@ -663,7 +668,8 @@ namespace NoiseSimulator
             // Update the numeric control range
             signalSquareNumeric!.Maximum = maxValidIndex;
             
-            // If current value exceeds new maximum, reset to 0
+            // Only reset to 0 if the current value is completely invalid (exceeds new maximum)
+            // Don't reset if the user has manually set a valid value
             if (signalSquareNumeric!.Value > maxValidIndex)
             {
                 signalSquareNumeric!.Value = 0;

@@ -11,12 +11,14 @@ public class SignalGenerator
          0, -1, -1, -1, 0,  1,  1,  1, // 9 squares (3x3)
          1,  0, -1, -2, -2, -2, -2, -2, -1,  0,  1,  2,  2,  2,  2,  2, // 25 squares (5x5)
          2,  1,  0, -1, -2, -3, -3, -3, -3, -3, -3, -3, -2, -1,  0,  1,  2,  3,  3,  3,  3,  3,  3,  3, // 49 squares (7x7)
-         3,  2,  1,  0, -1, -2, -3, -4, -4, -4, -4, -4, -4, -4, -4, -4, -3, -2, -1,  0,  1,  2,  3,  4,  4,  4,  4,  4,  4,  4,  4,  4 }; // 81 squares (9x9)
+         3,  2,  1,  0, -1, -2, -3, -4, -4, -4, -4, -4, -4, -4, -4, -4, -3, -2, -1,  0,  1,  2,  3,  4,  4,  4,  4,  4,  4,  4,  4,  4, // 81 squares (9x9)
+         4,  3,  2,  1,  0, -1, -2, -3, -4, -5, -5, -5, -5, -5, -5, -5, -5, -5, -5, -5, -4, -3, -2, -1,  0,  1,  2,  3,  4,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5 }; // 121 squares (11x11)
     public int[] SpiralPatternDy { get; } = { 0, // 1 square
         -1, -1,  0,  1,  1,  1,  0, -1, // 9 squares (3x3)
         -2, -2, -2, -2, -1,  0,  1,  2,  2,  2,  2,  2,  1,  0, -1, -2, // 25 squares (5x5)
         -3,  -3,  -3,  -3,  -3,  -3,  -2,  -1,  0,  1,  2,  3,  3,  3,  3,  3,  3,  3,  2,  1, 0, -1, -2, -3, // 49 squares (7x7)
-        -4, -4, -4, -4, -4, -4, -4, -4, -3, -2, -1,  0,  1,  2,  3,  4,  4,  4,  4,  4,  4,  4,  4,  4,  3,  2,  1,  0, -1, -2, -3, -4 }; // 81 squares (9x9)
+        -4, -4, -4, -4, -4, -4, -4, -4, -3, -2, -1,  0,  1,  2,  3,  4,  4,  4,  4,  4,  4,  4,  4,  4,  3,  2,  1,  0, -1, -2, -3, -4, // 81 squares (9x9)
+        -5, -5, -5, -5, -5, -5, -5, -5, -5, -5, -4, -3, -2, -1,  0,  1,  2,  3,  4,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  4,  3,  2,  1,  0, -1, -2, -3, -4, -5 }; // 121 squares (11x11)
     
     public double brightnessDecay = 0.891220943978059; // 1 magnitude every 8 steps of decaying brightness
 
@@ -44,6 +46,8 @@ public class SignalGenerator
                 return GetNSquaresSignalFlux(x, y, baseSignalFlux, 49, squareSize, useVerticalLines);
             case "9x9 Squares":
                 return GetNSquaresSignalFlux(x, y, baseSignalFlux, 81, squareSize, useVerticalLines);
+            case "11x11 Squares":
+                return GetNSquaresSignalFlux(x, y, baseSignalFlux, 121, squareSize, useVerticalLines);
             case "Gaussian Spots":
                 return GetGaussianSpotsSignalFlux(x, y, baseSignalFlux, squareSize);
             case "Continuous lines":
@@ -228,6 +232,7 @@ public class SignalGenerator
             "5x5 Squares" => 24,
             "7x7 Squares" => 48,
             "9x9 Squares" => 80,
+            "11x11 Squares" => 120,
             "Gaussian Spots" => 80, // Same as 9x9 pattern (81 spots, 0-80)
             "Continuous lines" => 4, // 5 lines (0-4), each spanning 2 magnitudes
             _ => 0

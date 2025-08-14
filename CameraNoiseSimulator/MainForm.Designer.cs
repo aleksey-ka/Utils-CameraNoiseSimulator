@@ -346,7 +346,7 @@ namespace NoiseSimulator
             signalSquareNumeric.BorderStyle = BorderStyle.FixedSingle;
             signalSquareNumeric.ForeColor = Color.White;
             signalSquareNumeric.Location = new Point(1280, 276);
-            signalSquareNumeric.Maximum = new decimal(new int[] { 80, 0, 0, 0 });
+            signalSquareNumeric.Maximum = new decimal(new int[] { 120, 0, 0, 0 });
             signalSquareNumeric.Name = "signalSquareNumeric";
             signalSquareNumeric.Size = new Size(56, 23);
             signalSquareNumeric.TabIndex = 20;
